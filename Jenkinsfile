@@ -1,10 +1,11 @@
-pipeline {
+﻿pipeline {
     agent any
 
     environment {
         BUILD_TAG = "${env.BUILD_NUMBER}"
         BACKEND_IMAGE  = "intellideploy-backend:${BUILD_TAG}"
         FRONTEND_IMAGE = "intellideploy-frontend:${BUILD_TAG}"
+        DOCKER_HOST = "tcp://localhost:2375"
     }
 
     options {
@@ -21,13 +22,14 @@ pipeline {
             }
         }
 
-        stage('Backend: Install & Test') {
+        stage('Backend: Install, Train, Test') {
             steps {
                 dir('backend') {
                     bat '''
                         python -m venv .venv
                         call .venv\\Scripts\\activate.bat
                         pip install --no-cache-dir -r requirements.txt
+                        python ml\\train_model.py
                         set PYTHONPATH=.
                         pytest tests/ --junitxml=test-results.xml
                     '''
@@ -36,17 +38,6 @@ pipeline {
             post {
                 always {
                     junit 'backend/test-results.xml'
-                }
-            }
-        }
-
-        stage('Train Model') {
-            steps {
-                dir('backend') {
-                    bat '''
-                        call .venv\\Scripts\\activate.bat
-                        python ml\\train_model.py
-                    '''
                 }
             }
         }
