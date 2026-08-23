@@ -1,4 +1,4 @@
-﻿pipeline {
+pipeline {
     agent any
 
     environment {
@@ -89,7 +89,7 @@
             echo "IntelliDeploy build #${env.BUILD_NUMBER} deployed successfully."
         }
         failure {
-            echo "IntelliDeploy build #${env.BUILD_NUMBER} failed — check stage logs above."
+            echo "IntelliDeploy build #${env.BUILD_NUMBER} failed - check stage logs above."
         }
         always {
             cleanWs()
