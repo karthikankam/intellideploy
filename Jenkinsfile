@@ -6,6 +6,7 @@ pipeline {
         BACKEND_IMAGE  = "intellideploy-backend:${BUILD_TAG}"
         FRONTEND_IMAGE = "intellideploy-frontend:${BUILD_TAG}"
         DOCKER_HOST = "tcp://localhost:2375"
+        DOCKER_BUILDKIT = "1"
     }
 
     options {
