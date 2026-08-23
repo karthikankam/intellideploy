@@ -24,11 +24,12 @@ pipeline {
         stage('Backend: Install & Test') {
             steps {
                 dir('backend') {
-                    sh '''
-                        python3 -m venv .venv
-                        . .venv/bin/activate
+                    bat '''
+                        python -m venv .venv
+                        call .venv\\Scripts\\activate.bat
                         pip install --no-cache-dir -r requirements.txt
-                        PYTHONPATH=. pytest tests/ --junitxml=test-results.xml
+                        set PYTHONPATH=.
+                        pytest tests/ --junitxml=test-results.xml
                     '''
                 }
             }
@@ -42,9 +43,9 @@ pipeline {
         stage('Train Model') {
             steps {
                 dir('backend') {
-                    sh '''
-                        . .venv/bin/activate
-                        python ml/train_model.py
+                    bat '''
+                        call .venv\\Scripts\\activate.bat
+                        python ml\\train_model.py
                     '''
                 }
             }
@@ -53,7 +54,7 @@ pipeline {
         stage('Frontend: Install & Build') {
             steps {
                 dir('frontend') {
-                    sh '''
+                    bat '''
                         npm install
                         npm run build
                     '''
@@ -63,20 +64,19 @@ pipeline {
 
         stage('Build Docker Images') {
             steps {
-                sh """
-                    docker build -t ${BACKEND_IMAGE} ./backend
-                    docker build -t ${FRONTEND_IMAGE} ./frontend
-                    docker tag ${BACKEND_IMAGE} intellideploy-backend:latest
-                    docker tag ${FRONTEND_IMAGE} intellideploy-frontend:latest
+                bat """
+                    docker build -t %BACKEND_IMAGE% ./backend
+                    docker build -t %FRONTEND_IMAGE% ./frontend
+                    docker tag %BACKEND_IMAGE% intellideploy-backend:latest
+                    docker tag %FRONTEND_IMAGE% intellideploy-frontend:latest
                 """
             }
         }
 
         stage('Deploy') {
             steps {
-                sh '''
-                    export BUILD_TAG=${BUILD_TAG}
-                    docker compose down --remove-orphans || true
+                bat '''
+                    docker compose down --remove-orphans
                     docker compose up -d --build
                 '''
             }
@@ -84,8 +84,8 @@ pipeline {
 
         stage('Smoke Test') {
             steps {
-                sh '''
-                    sleep 5
+                bat '''
+                    timeout /t 5
                     curl -f http://localhost:8000/health
                     curl -f http://localhost:8080/
                 '''
