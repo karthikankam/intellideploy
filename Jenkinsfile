@@ -76,7 +76,7 @@ pipeline {
                 sh '''
                     sleep 10
                     curl -f http://host.docker.internal:8000/health
-                    curl -f http://host.docker.internal:8080/
+                    curl -f http://host.docker.internal:8090/
                 '''
             }
         }

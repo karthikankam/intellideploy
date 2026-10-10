@@ -19,7 +19,7 @@ services:
     image: intellideploy-frontend:${BUILD_TAG:-latest}
     container_name: intellideploy-frontend
     ports:
-      - "8080:80"
+      - "8090:80"
     depends_on:
       - backend
     restart: unless-stopped
