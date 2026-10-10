@@ -25,7 +25,7 @@ pipeline {
             steps {
                 dir('backend') {
                     sh '''
-                        python -m venv .venv
+                        /opt/uv-python/cpython-3.11-linux-x86_64-gnu/bin/python3.11 -m venv .venv
                         . .venv/bin/activate
                         pip install --no-cache-dir -r requirements.txt
                         python ml/train_model.py
